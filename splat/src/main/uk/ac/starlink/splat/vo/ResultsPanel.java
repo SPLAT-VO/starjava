@@ -1099,7 +1099,7 @@ public class ResultsPanel extends JPanel implements ActionListener, MouseListene
                                     props.setIdSource(idSource);
                                     props.setDataLinkRequest(dataLinkRequest);
                                     props.setServerURL(dlp.getAccessURL());
-                                    String format = dlp.getFormat();
+                                    String format = dlp.getQueryFormat();
                                     if (format != null && format != "") {
                                         props.setDataLinkFormat(format);
                                         props.setType(SpecDataFactory.mimeToSPLATType( format ));
@@ -1193,7 +1193,7 @@ public class ResultsPanel extends JPanel implements ActionListener, MouseListene
                                         props.setDataLinkRequest(dataLinkRequest);
                                         // props.setServerURL(dataLinkQueryParam.get("AccessURL"));
                                         props.setServerURL(dlp.getAccessURL());
-                                        String format = dlp.getFormat();
+                                        String format = dlp.getQueryFormat();
                                         if (format != null && format != "") {
                                             props.setDataLinkFormat(format);
                                             props.setType(SpecDataFactory.mimeToSPLATType( format ) );
