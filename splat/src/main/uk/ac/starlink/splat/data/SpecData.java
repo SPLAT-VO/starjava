@@ -1883,15 +1883,16 @@ public class SpecData
             checkForExtractionPosition( astref, sigaxis );
 
             //  Create a frameset that is suitable for displaying a
-            //  "spectrum". This has a coordinate X axis and a data Y
+            //  "spectrum" or a timeseries. This has a coordinate X axis and a data Y
             //  axis. The coordinates are chosen to run along the sigaxis (if
             //  input data has more than one dimension) and may be a distance,
             //  rather than absolute coordinate.
+            //  
             FrameSet specref = null;
             try {
                 specref = ast.makeSpectral( sigaxis, 0, yPos.length,
                                             getDataLabel(), getDataUnits(),
-                                            false, searchForSpecFrames );
+                                            false, searchForSpecFrames, impl.getObjectType()==ObjectTypeEnum.TIMESERIES );
             }
             catch (AstException e) {
                 throw new SplatException( "Failed to find a valid spectral " +
@@ -1921,6 +1922,10 @@ public class SpecData
                 xPos = tPos;
                 tPos = null;
 
+                if (impl.getObjectType()==ObjectTypeEnum.TIMESERIES ) {
+                    FrameSet frameSet = astJ.getRef();
+                    frameSet.setC("System", impl.getTimeSystem());
+                }
                 //  Set the apparent data units, if possible.
                 convertToApparentDataUnits();
 
@@ -1935,6 +1940,7 @@ public class SpecData
             catch (Exception e) {
                 throw new SplatException( e );
             }
+            
         }
     }
 
