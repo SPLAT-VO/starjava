@@ -55,6 +55,7 @@ import uk.ac.starlink.splat.plot.PlotControl;
 import uk.ac.starlink.splat.util.GraphicFileUtilities;
 import uk.ac.starlink.splat.util.SplatException;
 import uk.ac.starlink.splat.util.Utilities;
+import uk.ac.starlink.splat.vo.LineBrowser;
 import uk.ac.starlink.util.gui.BasicFileChooser;
 
 /**
@@ -179,6 +180,7 @@ public class PlotControlFrame
     protected JMenu optionsMenu = new JMenu();
     protected JMenuBar menuBar = new JMenuBar();
     protected JMenuItem drawMenu = new JMenuItem();
+    protected JMenuItem openSlapBrowser = null;
     protected JMenuItem loadAllLineIDs = null;
     protected JMenuItem loadLoadedLineIDs = null;
     protected JMenuItem removeCurrent = null;
@@ -204,6 +206,8 @@ public class PlotControlFrame
      * Show deblend tools, removed once development is complete.
      */
     private boolean showDeblend = false;
+
+    private LineBrowser slapBrowser;
 
     /**
      *  Create an instance using an existing SpecDataComp.
@@ -419,6 +423,7 @@ public class PlotControlFrame
             ImageHolder.class.getResource( "config.gif" ) );
         ImageIcon pannerImage = new ImageIcon(
             ImageHolder.class.getResource( "panner.gif" ) );
+      
 
         //  Add action to print figure.
         PrintAction printAction  =
@@ -509,6 +514,7 @@ public class PlotControlFrame
             new ImageIcon( ImageHolder.class.getResource( "flip.gif" ) );
         ImageIcon statsImage =
             new ImageIcon( ImageHolder.class.getResource( "sigma.gif" ) );
+
 
         //  Add action to enable to cut out the current view of
         //  current spectrum.
@@ -616,6 +622,7 @@ public class PlotControlFrame
         optionsMenu.setText( "Options" );
         optionsMenu.setMnemonic( KeyEvent.VK_O );
         menuBar.add( optionsMenu );
+        
 
         //  Arrange to carefully align coordinates when asked (expensive
         //  otherwise).
@@ -740,7 +747,23 @@ public class PlotControlFrame
         lineOptionsMenu.setText( "Line identifiers" );
         lineOptionsMenu.setMnemonic( KeyEvent.VK_L );
         optionsMenu.add( lineOptionsMenu );
+        
+        ImageIcon linesImage = new ImageIcon(
+                ImageHolder.class.getResource( "linestrs.png" ) );
 
+
+        openSlapBrowser = new JMenuItem("SLAP Browser");
+        
+      
+        SLAPAction slapAction =
+                new SLAPAction( "Lines Browser", linesImage,
+                        "Open Spectral Line browser (SLAP/VAMDC)" );
+        lineOptionsMenu.add(slapAction);
+      
+        toolBar.add( slapAction );
+     
+        //openSlapBrowser.addActionListener( this );
+    
         //  Load line identifiers into the plot. This comes in two flavours
         //  load all line identifiers and only those that are already
         //  available in the global list.
@@ -1480,6 +1503,27 @@ public class PlotControlFrame
             stackerFrame = null;
         }
     }
+    
+    /**
+     *  Activate the SLAP Browser window.
+     */
+    public void showSlapBrowser()
+    {
+        coordinateMatching.setSelected( true );
+        if ( slapBrowser == null ) {
+            slapBrowser = new LineBrowser( getPlot() );
+            //  We'd like to know if the window is closed.
+ /*           slapBrowser.addWindowListener( new WindowAdapter() {
+                    public void windowClosed( WindowEvent evt ) {
+                        slapBrowserClosed();
+                    }
+                });
+ */
+        } else {
+            Utilities.raiseFrame( slapBrowser );
+        }
+    }
+
 
     /**
      * Set the main cursor to indicate waiting for some action to
@@ -1914,6 +1958,25 @@ public class PlotControlFrame
             lineFit();
         }
     }
+    
+    /**
+     *  Inner class defining Action for SLAP browsing and adding spectral lines.
+     */
+    protected class SLAPAction extends AbstractAction
+    {
+        public SLAPAction( String name, Icon icon, String help )
+        {
+            super( name, icon);
+           // super( name);
+            putValue( SHORT_DESCRIPTION, help );
+
+            //putValue( ACCELERATOR_KEY, KeyStroke.getKeyStroke( "control V" ) );
+        }
+        public void actionPerformed( ActionEvent ae )
+        {
+            showSlapBrowser();
+        }
+    }
 
     //
     // Implement ItemListener interface. This is used for menus items
@@ -2126,6 +2189,11 @@ public class PlotControlFrame
             return;
         }
 
+      /*  if ( source.equals( openSlapBrowser ) ) {
+            slapBrowser = new SLAPBrowser( plot);
+            return;
+        }*/
+        
         if ( source.equals( loadAllLineIDs ) ) {
             plot.loadLineIDs( true, doubleDSBLineIDs.isSelected(),
                               LocalLineIDManager.getInstance() );
@@ -2143,4 +2211,6 @@ public class PlotControlFrame
             return;
         }
     }
+    
+    //  add listener to slap browser -> load spectral line frames
 }

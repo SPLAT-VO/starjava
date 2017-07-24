@@ -1,5 +1,6 @@
 \documentclass[twoside,11pt,nolof]{starlink}
 \usepackage{animate}
+\usepackage{longtable}
 
 
 % -----------------------------------------------------------------------------
@@ -149,6 +150,10 @@ in the Virtual Observatory.
 
 Finally, \SPLAT\ can interoperate with other VO enabled desktop tools using
 the SAMP protocol.
+
+SPLAT can also display time series in certain formats, and search for spectral lines
+using VO and VAMDC services . This are still  experimental features, and will evolve 
+as  the respective IVOA standards evolve.
 
 % Not advertising this yet. Maybe big changes ahead. Need to make all this
 % controlled from the command-line and produce macro replays and scripts.
@@ -407,8 +412,9 @@ button, or `drag' the rectangle itself.
 If the panner view seems very small, as can happen when you're using a
 high X scale factor, then try resizing the window to get a better fit
 to the aspect ratio (hint: make it taller).
-
 \mainfigure{pannerwindow}
+
+\newpage
 
 \section{Help for individual windows\xlabel{help_window_individual}}
 
@@ -418,7 +424,7 @@ material, the function of windows should be clear from their
 descriptions, balloon-help and context. Use a window's \menuitem{Help}
 menu to view its related page on-line.
 
-\newpage
+
 \subsection{The browser window\xlabel{browser_window}}
 
 The browser window has several main elements, each of which is shown
@@ -646,7 +652,7 @@ in the following figure:
 
 The anatomy of a plot window is shown below:
 
-\mainfigure{plot3}
+\mainfigure{plot2}
 
 It has three main regions, the menubar \& toolbar, the control panel and
 the display area.\\
@@ -797,7 +803,7 @@ the display area.\\
 
  \begin{itemize}
 
-  \item \inline{print} Print a copy of the display area to an installed
+  \item[] \inline{print} Print a copy of the display area to an installed
   printer or to a file. The output produced fits the output page format using
   the current aspect ratio of the display area, so if you're zoomed by a large
   factor then you'll get an output page that has a very small height. If you
@@ -960,6 +966,10 @@ the display area.\\
   option to only display axes in the visible area this will potentially slow
   down scroll operations a lot, so the default is off.
 
+ \item \subsubmenuitem{Options}{Line identifiers}{Line Browser}
+  This option opens the  \SPLAT\ Line Browser window, which allows to search for 
+  spectral lines using the VO and VAMDC.
+  
   \item \subsubmenuitem{Options}{Line identifiers}{Load all matching line identifiers}
   If you select this option then all line identifiers known to \SPLAT\
   (including any that you have opened yourself), and whose coordinate ranges
@@ -1309,20 +1319,28 @@ item is still switched on in the plot window.
 To view a single spectrum quickly just double click on its row. This will
 download the spectrum and display it in its own plot window.\\
 
-\subheading{Server-side manipulation with DataLink}
+\subheading{Server-side manipulation with Datalink/SODA}
 
-\SPLAT\ supports server-side manipulation through \textbf{DataLink}. After a SSAP Query is sent, \SPLAT\ checks the responding servers for  \textbf{DataLink} parameters, and marks them with a symbol (\inline{cutter}). If  at least one \textbf{DataLink} supporting server has been found, a \textbf{DataLink} button will appear below the query results. By clicking on it, \textbf{DataLink}. will be activated, and all results tabs will be deactivated except the results from servers that support \textbf{DataLink}. When you choose one of the active services, a window will appear, where the respective parameters for sever-side manipulation can be entered. The parameters will be set by clicking on the \textbf{set parameters} button. While  \textbf{dataLink} is activated and the parameters are set, the spectra you select and display or download will be manipulated using the chosen parameters. To deactivate \textbf{dataLink} and have retrieve the original spectra just click on the \textbf{dataLink} button again.
+\SPLAT\ supports server-side manipulation through \textbf{Datalink/SODA} (Server-side Operations for Data Access). After a SSAP Query is sent, \SPLAT\ checks the services' responses  for  \textbf{Datalink/SODA} parameters, and marks them with a symbol (\inline{cutter}). If at least one supporting service has been found, a \textbf{Datalink} button will appear below the query results. By clicking on it, the button will be activated and all results tabs will be deactivated except the results from servers that support \textbf{Datalink/SODA}. When you choose one of the active services, a window will appear, where the respective parameters for sever-side manipulation can be entered. After editing the parameters set them by clicking on the \textbf{set parameters} button. While  the \textbf{Datalink} button is activated and the parameters are set, the spectra you select, display or download will be manipulated using the chosen parameters. To deactivate it and retrieve the unmodified original spectra just click on the \textbf{Datalink} button again to deactivate it.
+
 \mainfigure{datalinkparams}
 
 \subheading{Implementation status}
 
-SSAP is a protocol being developed by the IVOA
+SSAP, DataLink, and SODA are  being developed by the IVOA
 (\htmladdnormallinkfoot{International Virtual Observatory Alliance}
 {http://www.ivoa.net/}).
 
-Currently spectra returned from SSAP servers may only be in basic formats,
-that is simple FITS and VOTables (partially some SED data model serialisation).
-However, the \SPLAT\ data model includes errors as well as coordinates and
+Spectra returned from SSAP servers are mainly FITS and VOTables. SPLAT handles
+also VOTables using DataLink and SODA standards. 
+Besides that, SPLAT tries to recognise and display Timeseries. This function is still a prototype and
+will be further developed following the development of the time domain standards by IVOA.
+
+%Currently spectra returned from SSAP servers may be in basic formats,
+%that is simple FITS and VOTables (partially some SED data model serialisation).
+
+%However, 
+The \SPLAT\ data model includes errors as well as coordinates and
 data values.
 
 Support for spectral coordinates is provided by the Starlink AST library
@@ -1367,7 +1385,7 @@ and there are no optional parameters, as all parameters can be queried using TAP
 
 \subheading{Simple Search}
 The simple search interface uses the same parameters as the SSAP cone search, with the same
-functionality.
+functionality. One difference is the "data product" option, where either spectrum' or 'timeseries' can be chosen.
 
 \mainfigure{obscoresimple}
 
@@ -1380,7 +1398,8 @@ SELECT TOP 10000 * from ivoa.Obscore WHERE dataproduct_type='spectrum'
 will get the first 10000 spectra from the selected servers. The TOP value may be changed to
 another value, if necessary. This query should be then refined or completed, either by choosing the
 parameters and expressions from the options provided (which will create a simple query) or
-by editing directly the  the text area.  Please refer to the ObsCore standard for the available parameters.
+by editing directly the  the text area. For example, you can exchange 'spectrum' through 'timeseries'
+to retrieve time series.  Please refer to the ObsCore standard for the available parameters.
 (http://www.ivoa.net/documents/ObsCore/).
 \mainfigure{obscoreadql}
 The example below shows a query for spectra including 6500 angstroms, spectral resolution better than 15 angstroms, spatial
@@ -1390,7 +1409,7 @@ SELECT * from ivoa.Obscore
 WHERE dataproduct_type='spectrum'
 AND em_min < 650E-9
 AND em_max > 650E-9
-AND em_res_power > 6500/15.
+AND em_res_power > 6500/15
 AND s_resolution < 2
 AND t_exptime > 3600
 \end{verbatim}
@@ -1400,6 +1419,40 @@ AND t_exptime > 3600
 ObsCore and TAP are  being developed by the IVOA
 (\htmladdnormallinkfoot{International Virtual Observatory Alliance}
 {http://www.ivoa.net/}).
+
+\newpage
+\subsection{Spectral lines query\xlabel{lines_browser}}
+
+
+To start the spectral lines browser window, click on the \inline{speclines} symbol from
+a plot.
+In this window, spectral lines  can be searched using SLAP and VAMDC services
+and displayed into a plot. First of all, one or more wavelength ranges have to
+be added to the ranges list by clicking on the {Add} Button and selecting a region
+in the plot. The selected region will be marked by a gray rectangle. After the query, 
+or when it's not needed anymore, it can be removed from  the plot using the {Delete} button.
+
+\mainfigure{spectrallineswindow}
+
+The query options that can be added are element symbol and stage/ion charge. Most SLAP 
+services do not support (yet) the later, but it's supported by VAMDC services.
+
+The selection of the services to be queried is similar to the one SSAP and Obscore browsers.
+In this case, there are two tabs, one for SLAP services, and other for VAMDC services.
+
+The {Search} Button sends the query to the selected services. The results will appear on the
+results area on the right side of the window. To display selected lines on the plot use the
+use the buttons on the lower right side, or right-click on the line you want to display.
+The {Remove lines} button removes all lines from the plot.
+
+The lines browser window is linked to the plot which started it. Wavelength range selection 
+can be done only in this plot, as well as spectral lines can be only displayed in this plot.
+
+SLAP (Simple Line Access Protocol) is   being developed by the IVOA
+(\htmladdnormallinkfoot{International Virtual Observatory Alliance}
+{http://www.ivoa.net/}), and VAMDC services are provided by the 
+(\htmladdnormallinkfoot{VAMDC Consortium}{http://www.vamdc.org/}).
+
 
 
 \newpage
@@ -1868,7 +1921,7 @@ sqrt(sym1)          & square root \\
 \end{center}
 
 \begin{center}
-\begin{tabular}{|l|l|l|l|}
+\begin{longtable}{|l|l|l|l|}
 \hline
 \multicolumn{4}{|c|}{{\large Derived units}} \\ \hline
 \multicolumn{1}{|c|}{Quantity} & \multicolumn{1}{|c|}{Symbol} &
@@ -1921,8 +1974,9 @@ time  & yr & year & 31557600 s \\
 time  & min & minute & 60 s \\
       & D & Debye & 1.0E-29/3 C.m \\
 \hline
-\end{tabular}
+\end{longtable}
 \end{center}
+
 
 \subheading{Accelerator keys}
 
@@ -3322,6 +3376,8 @@ is opened as a table, this allows you to select the columns. There is also a
 special type known as \hitext{guess}. When you choose that attempts to open
 the spectrum as different types are made until one succeeds, or the
 possibilities are exhausted.
+Spectra retrieved by the VO often do not have an extension, and their types
+can also be discovered by checking the mime type returned.
 
 You can specify a type for all the spectra opened on the command-line using
 the
@@ -3653,10 +3709,10 @@ also funded by the
 and more recently by it's successor organisation the
 \htmladdnormallink{Science and Technology Facilities Council}{http://www.scitech.ac.uk}.
 
-Further development has been done by the
-\htmladdnormallink{German Astrophysical Virtual Observatory  (GAVO)} {http://www.g-vo.org} team at the
-\htmladdnormallink{Zentrum f\"ur Astronomie Heidelberg} {http://www.zah.uni-heidelberg.de}.
-GAVO is funded through the Verbundforschung of the German Ministry for Research (BMBF).
+Further development has been done by the 
+\htmladdnormallink{German Astrophysical Virtual Observatory  (GAVO)} {http://www.g-vo.org} team at the 
+\htmladdnormallink{Zentrum f\"ur Astronomie Heidelberg} {http://www.zah.uni-heidelberg.de}. 
+GAVO was funded through the Verbundforschung of the German Ministry for Research (BMBF) until June 2017.
 
 When using this software for research please consider citing it in your papers. The main
 refereed paper is ``Spectroscopic analysis in the virtual observatory environment with SPLAT-VO'',
